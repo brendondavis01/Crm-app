@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Web Agency CRM</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg1: #ffffff; --bg2: #f5f5f4; --bg3: #eeede8;
+    --bg-info: #e6f1fb; --bg-danger: #fcebeb; --bg-success: #eaf3de; --bg-warn: #faeeda;
+    --tx1: #1a1a18; --tx2: #5f5e5a; --tx3: #888780;
+    --tx-info: #0c447c; --tx-danger: #791f1f; --tx-success: #27500a; --tx-warn: #633806;
+    --bd: rgba(26,26,24,0.15); --bd2: rgba(26,26,24,0.3); --bd3: rgba(26,26,24,0.4);
+    --bd-danger: #f7c1c1;
+    --r: 8px; --rl: 12px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg1: #1c1c1a; --bg2: #252523; --bg3: #2c2c2a;
+      --bg-info: #042c53; --bg-danger: #501313; --bg-success: #173404; --bg-warn: #412402;
+      --tx1: #f0efe8; --tx2: #b4b2a9; --tx3: #888780;
+      --tx-info: #85b7eb; --tx-danger: #f09595; --tx-success: #97c459; --tx-warn: #ef9f27;
+      --bd: rgba(240,239,232,0.15); --bd2: rgba(240,239,232,0.3); --bd3: rgba(240,239,232,0.4);
+    }
+  }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg3); color: var(--tx1); min-height: 100vh; }
+  .app { max-width: 980px; margin: 0 auto; padding: 2rem 1rem; }
+  .tabs { display: flex; gap: 4px; margin-bottom: 1.5rem; border-bottom: 0.5px solid var(--bd); }
+  .tab { padding: 8px 16px; font-size: 13px; cursor: pointer; border: none; background: none; color: var(--tx2); border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all 0.15s; }
+  .tab.active { color: var(--tx1); border-bottom-color: var(--tx1); font-weight: 500; }
+  .tab:hover:not(.active) { color: var(--tx1); }
+  .section { display: none; } .section.active { display: block; }
+  .metrics { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 10px; margin-bottom: 1.5rem; }
+  .metric { background: var(--bg2); border-radius: var(--r); padding: 14px 16px; }
+  .metric-label { font-size: 12px; color: var(--tx2); margin-bottom: 4px; }
+  .metric-value { font-size: 22px; font-weight: 500; }
+  .metric-sub { font-size: 11px; color: var(--tx3); margin-top: 2px; }
+  .card { background: var(--bg1); border: 0.5px solid var(--bd); border-radius: var(--rl); padding: 1rem 1.25rem; margin-bottom: 10px; }
+  .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .card-title { font-size: 14px; font-weight: 500; }
+  .btn { padding: 7px 14px; font-size: 13px; border: 0.5px solid var(--bd2); border-radius: var(--r); background: var(--bg1); color: var(--tx1); cursor: pointer; transition: all 0.15s; }
+  .btn:hover { background: var(--bg2); }
+  .btn-primary { background: var(--tx1); color: var(--bg1); border-color: var(--tx1); }
+  .btn-primary:hover { opacity: 0.85; }
+  .btn-sm { padding: 4px 10px; font-size: 12px; }
+  .btn-danger { color: var(--tx-danger); border-color: var(--bd-danger); }
+  .btn-danger:hover { background: var(--bg-danger); }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+  .form-group { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
+  .form-group label { font-size: 12px; color: var(--tx2); }
+  .form-group input, .form-group select, .form-group textarea { font-size: 13px; padding: 7px 10px; border: 0.5px solid var(--bd2); border-radius: var(--r); background: var(--bg1); color: var(--tx1); outline: none; }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--bd3); }
+  .form-group textarea { resize: vertical; min-height: 60px; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 500; }
+  .bl { background:#E6F1FB; color:#0C447C; } .bc { background:#FAEEDA; color:#633806; }
+  .bp { background:#EEEDFE; color:#3C3489; } .bx { background:#EAF3DE; color:#27500A; } .bo { background:#FCEBEB; color:#791F1F; }
+  .pipeline { display: grid; grid-template-columns: repeat(5, minmax(0,1fr)); gap: 8px; margin-bottom: 1rem; }
+  .pcol { background: var(--bg2); border-radius: var(--r); padding: 10px; min-height: 200px; }
+  .pcol-hdr { font-size: 11px; font-weight: 500; color: var(--tx2); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 8px; display: flex; justify-content: space-between; }
+  .pcard { background: var(--bg1); border: 0.5px solid var(--bd); border-radius: var(--r); padding: 8px 10px; margin-bottom: 6px; cursor: pointer; transition: all 0.15s; }
+  .pcard:hover { border-color: var(--bd2); }
+  .pcard-name { font-size: 13px; font-weight: 500; }
+  .pcard-biz { font-size: 11px; color: var(--tx2); margin-top: 2px; }
+  .pcard-val { font-size: 12px; font-weight: 500; margin-top: 4px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; padding: 8px 12px; font-size: 11px; font-weight: 500; color: var(--tx2); border-bottom: 0.5px solid var(--bd); }
+  td { padding: 10px 12px; border-bottom: 0.5px solid var(--bd); }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--bg2); }
+  .modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 100; align-items: center; justify-content: center; }
+  .modal-bg.open { display: flex; }
+  .modal { background: var(--bg1); border-radius: var(--rl); padding: 1.5rem; width: 480px; max-width: 95vw; max-height: 85vh; overflow-y: auto; border: 0.5px solid var(--bd); }
+  .modal-title { font-size: 16px; font-weight: 500; margin-bottom: 1rem; }
+  .modal-footer { display: flex; gap: 8px; justify-content: flex-end; margin-top: 1rem; }
+  .empty { text-align: center; padding: 3rem; color: var(--tx3); font-size: 14px; }
+  .search-bar { display: flex; gap: 8px; margin-bottom: 1rem; }
+  .search-bar input, .search-bar select { font-size: 13px; padding: 7px 10px; border: 0.5px solid var(--bd2); border-radius: var(--r); background: var(--bg1); color: var(--tx1); outline: none; }
+  .search-bar input { flex: 1; }
+  .aitem { display: flex; gap: 10px; padding: 8px 0; border-bottom: 0.5px solid var(--bd); font-size: 13px; }
+  .aitem:last-child { border-bottom: none; }
+  .atime { font-size: 11px; color: var(--tx3); white-space: nowrap; }
+  @media (max-width: 600px) { .metrics { grid-template-columns: repeat(2,1fr); } .pipeline { grid-template-columns: repeat(2,1fr); } .form-row { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="app">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;">
+    <div>
+      <div style="font-size:20px;font-weight:500;">Web Agency CRM</div>
+      <div style="font-size:13px;color:var(--tx2);margin-top:2px;">Brendon's client pipeline</div>
+    </div>
+    <button class="btn btn-primary" onclick="openAddLead()">+ Add lead</button>
+  </div>
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('dashboard',this)">Dashboard</button>
+    <button class="tab" onclick="switchTab('pipeline',this)">Pipeline</button>
+    <button class="tab" onclick="switchTab('leads',this)">All leads</button>
+    <button class="tab" onclick="switchTab('revenue',this)">Revenue</button>
+    <button class="tab" onclick="switchTab('activity',this)">Activity</button>
+  </div>
+  <div id="dashboard" class="section active">
+    <div class="metrics" id="metrics"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div class="card"><div class="card-header"><div class="card-title">Recent leads</div></div><div id="recent-leads"></div></div>
+      <div class="card"><div class="card-header"><div class="card-title">Upcoming follow-ups</div></div><div id="followups"></div></div>
+    </div>
+  </div>
+  <div id="pipeline" class="section"><div class="pipeline" id="pipeline-board"></div></div>
+  <div id="leads" class="section">
+    <div class="search-bar">
+      <input type="text" placeholder="Search leads..." id="search-input" oninput="renderLeads()" />
+      <select id="status-filter" onchange="renderLeads()">
+        <option value="">All statuses</option><option value="lead">Lead</option>
+        <option value="contacted">Contacted</option><option value="proposal">Proposal sent</option>
+        <option value="closed">Closed</option><option value="lost">Lost</option>
+      </select>
+    </div>
+    <div class="card" style="padding:0;overflow:hidden;">
+      <table><thead><tr><th>Business</th><th>Contact</th><th>Status</th><th>Value</th><th>Follow-up</th><th></th></tr></thead><tbody id="leads-table"></tbody></table>
+    </div>
+  </div>
+  <div id="revenue" class="section">
+    <div class="metrics" id="rev-metrics"></div>
+    <div class="card">
+      <div class="card-header"><div class="card-title">Closed deals</div></div>
+      <table><thead><tr><th>Business</th><th>Contact</th><th>Amount</th><th>Package</th><th>Close date</th><th>Retainer</th></tr></thead><tbody id="closed-table"></tbody></table>
+    </div>
+  </div>
+  <div id="activity" class="section">
+    <div class="card"><div class="card-header"><div class="card-title">Activity log</div></div><div id="activity-log"></div></div>
+  </div>
+</div>
+<div class="modal-bg" id="modal-bg"><div class="modal" id="modal-content"></div></div>
+<script>
+const SK='web_agency_crm_v2';
+let D={leads:[],activity:[]},EID=null;
+function load(){try{const s=localStorage.getItem(SK);if(s)D=JSON.parse(s);}catch(e){}render();}
+function save(){try{localStorage.setItem(SK,JSON.stringify(D));}catch(e){}}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2);}
+function fmt(n){return'$'+Number(n).toLocaleString();}
+function badge(s){const m={lead:'bl',contacted:'bc',proposal:'bp',closed:'bx',lost:'bo'};const l={lead:'Lead',contacted:'Contacted',proposal:'Proposal sent',closed:'Closed',lost:'Lost'};return`<span class="badge ${m[s]||''}">${l[s]||s}</span>`;}
+function log(msg){D.activity.unshift({id:uid(),msg,time:new Date().toISOString()});if(D.activity.length>100)D.activity.pop();}
+function ago(iso){const d=new Date(iso),n=new Date(),m=Math.floor((n-d)/60000);if(m<1)return'just now';if(m<60)return m+'m ago';const h=Math.floor(m/60);if(h<24)return h+'h ago';return Math.floor(h/24)+'d ago';}
+function render(){rMetrics();rPipeline();renderLeads();rRevenue();rActivity();rRecent();rFollowups();}
+function rMetrics(){const L=D.leads,cl=L.filter(l=>l.status==='closed'),rv=cl.reduce((s,l)=>s+Number(l.value||0),0),rt=cl.reduce((s,l)=>s+Number(l.retainer||0),0),ac=L.filter(l=>!['closed','lost'].includes(l.status)).length;document.getElementById('metrics').innerHTML=`<div class="metric"><div class="metric-label">Total revenue</div><div class="metric-value">${fmt(rv)}</div><div class="metric-sub">${cl.length} deals closed</div></div><div class="metric"><div class="metric-label">Monthly retainers</div><div class="metric-value">${fmt(rt)}</div><div class="metric-sub">recurring/mo</div></div><div class="metric"><div class="metric-label">Active pipeline</div><div class="metric-value">${ac}</div><div class="metric-sub">leads in progress</div></div><div class="metric"><div class="metric-label">Total leads</div><div class="metric-value">${D.leads.length}</div><div class="metric-sub">all time</div></div>`;}
+function rPipeline(){const stages=['lead','contacted','proposal','closed','lost'],labels={lead:'Lead',contacted:'Contacted',proposal:'Proposal',closed:'Closed',lost:'Lost'};let h='';stages.forEach(s=>{const it=D.leads.filter(l=>l.status===s),v=it.reduce((sum,l)=>sum+Number(l.value||0),0);h+=`<div class="pcol"><div class="pcol-hdr"><span>${labels[s]}</span><span>${it.length}</span></div>`;it.forEach(l=>{h+=`<div class="pcard" onclick="editLead('${l.id}')"><div class="pcard-name">${l.contact||'—'}</div><div class="pcard-biz">${l.business||'—'}</div>${l.value?`<div class="pcard-val">${fmt(l.value)}</div>`:''}</div>`;});if(s!=='lost'&&s!=='closed'&&v)h+=`<div style="font-size:11px;color:var(--tx3);margin-top:4px;">${fmt(v)} potential</div>`;h+='</div>';});document.getElementById('pipeline-board').innerHTML=h;}
+function renderLeads(){const q=(document.getElementById('search-input')||{}).value||'',sf=(document.getElementById('status-filter')||{}).value||'';let L=D.leads.filter(l=>{const m=!q||[l.business,l.contact,l.email,l.phone].join(' ').toLowerCase().includes(q.toLowerCase());return m&&(!sf||l.status===sf);});document.getElementById('leads-table').innerHTML=L.length?L.map(l=>`<tr><td style="font-weight:500;">${l.business||'—'}</td><td>${l.contact||'—'}</td><td>${badge(l.status)}</td><td>${l.value?fmt(l.value):'—'}</td><td style="font-size:12px;color:var(--tx2);">${l.followup||'—'}</td><td><button class="btn btn-sm" onclick="editLead('${l.id}')">Edit</button></td></tr>`).join(''):`<tr><td colspan="6"><div class="empty">No leads yet — add your first one!</div></td></tr>`;}
+function rRevenue(){const cl=D.leads.filter(l=>l.status==='closed'),rv=cl.reduce((s,l)=>s+Number(l.value||0),0),rt=cl.reduce((s,l)=>s+Number(l.retainer||0),0),avg=cl.length?Math.round(rv/cl.length):0;document.getElementById('rev-metrics').innerHTML=`<div class="metric"><div class="metric-label">Total earned</div><div class="metric-value">${fmt(rv)}</div></div><div class="metric"><div class="metric-label">Monthly retainers</div><div class="metric-value">${fmt(rt)}/mo</div></div><div class="metric"><div class="metric-label">Avg deal size</div><div class="metric-value">${fmt(avg)}</div></div><div class="metric"><div class="metric-label">Deals closed</div><div class="metric-value">${cl.length}</div></div>`;document.getElementById('closed-table').innerHTML=cl.length?cl.map(l=>`<tr><td style="font-weight:500;">${l.business||'—'}</td><td>${l.contact||'—'}</td><td style="font-weight:500;">${fmt(l.value||0)}</td><td style="font-size:12px;">${l.package||'—'}</td><td style="font-size:12px;color:var(--tx2);">${l.closedate||'—'}</td><td>${l.retainer?fmt(l.retainer)+'/mo':'—'}</td></tr>`).join(''):`<tr><td colspan="6"><div class="empty">No closed deals yet</div></td></tr>`;}
+function rActivity(){const el=document.getElementById('activity-log');el.innerHTML=D.activity.length?D.activity.slice(0,50).map(a=>`<div class="aitem"><div style="flex:1;">${a.msg}</div><div class="atime">${ago(a.time)}</div></div>`).join(''):`<div class="empty">No activity yet</div>`;}
+function rRecent(){const r=[...D.leads].reverse().slice(0,4);document.getElementById('recent-leads').innerHTML=r.length?r.map(l=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:0.5px solid var(--bd);"><div><div style="font-size:13px;font-weight:500;">${l.business||'—'}</div><div style="font-size:12px;color:var(--tx2);">${l.contact||'—'}</div></div>${badge(l.status)}</div>`).join(''):`<div class="empty" style="padding:1.5rem;">No leads yet</div>`;}
+function rFollowups(){const td=new Date().toISOString().slice(0,10),due=D.leads.filter(l=>l.followup&&l.followup>=td&&!['closed','lost'].includes(l.status)).sort((a,b)=>a.followup.localeCompare(b.followup)).slice(0,5);document.getElementById('followups').innerHTML=due.length?due.map(l=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:0.5px solid var(--bd);"><div><div style="font-size:13px;font-weight:500;">${l.business||'—'}</div><div style="font-size:12px;color:var(--tx2);">${l.contact||'—'}</div></div><div style="font-size:12px;color:var(--tx2);">${l.followup}</div></div>`).join(''):`<div class="empty" style="padding:1.5rem;">No upcoming follow-ups</div>`;}
+function switchTab(t,btn){document.querySelectorAll('.tab').forEach(e=>e.classList.remove('active'));document.querySelectorAll('.section').forEach(e=>e.classList.remove('active'));btn.classList.add('active');document.getElementById(t).classList.add('active');render();}
+function openModal(h){document.getElementById('modal-content').innerHTML=h;document.getElementById('modal-bg').classList.add('open');}
+function closeModal(){document.getElementById('modal-bg').classList.remove('open');EID=null;}
+document.getElementById('modal-bg').onclick=function(e){if(e.target===this)closeModal();};
+function leadForm(l){l=l||{};return`<div class="modal-title">${EID?'Edit lead':'Add new lead'}</div><div class="form-row"><div class="form-group"><label>Business name</label><input id="f-biz" value="${l.business||''}" placeholder="Acme Plumbing"/></div><div class="form-group"><label>Contact name</label><input id="f-contact" value="${l.contact||''}" placeholder="John Smith"/></div></div><div class="form-row"><div class="form-group"><label>Phone</label><input id="f-phone" value="${l.phone||''}" placeholder="(541) 555-0100"/></div><div class="form-group"><label>Email</label><input id="f-email" value="${l.email||''}" placeholder="john@acme.com"/></div></div><div class="form-row"><div class="form-group"><label>Status</label><select id="f-status">${['lead','contacted','proposal','closed','lost'].map(s=>`<option value="${s}"${l.status===s?' selected':''}>${{lead:'Lead',contacted:'Contacted',proposal:'Proposal sent',closed:'Closed',lost:'Lost'}[s]}</option>`).join('')}</select></div><div class="form-group"><label>Deal value ($)</label><input id="f-value" type="number" value="${l.value||800}" placeholder="800"/></div></div><div class="form-row"><div class="form-group"><label>Package</label><select id="f-package"><option value="Basic ($800)"${l.package==='Basic ($800)'?' selected':''}>Basic ($800)</option><option value="Standard ($1,200)"${l.package==='Standard ($1,200)'?' selected':''}>Standard ($1,200)</option><option value="Premium ($1,800)"${l.package==='Premium ($1,800)'?' selected':''}>Premium ($1,800)</option><option value="Custom"${l.package==='Custom'?' selected':''}>Custom</option></select></div><div class="form-group"><label>Monthly retainer ($)</label><input id="f-retainer" type="number" value="${l.retainer||''}" placeholder="75"/></div></div><div class="form-row"><div class="form-group"><label>Follow-up date</label><input id="f-followup" type="date" value="${l.followup||''}"/></div><div class="form-group"><label>Close date</label><input id="f-closedate" type="date" value="${l.closedate||''}"/></div></div><div class="form-group"><label>Industry</label><input id="f-industry" value="${l.industry||''}" placeholder="Plumbing, Salon, HVAC..."/></div><div class="form-group"><label>Notes</label><textarea id="f-notes">${l.notes||''}</textarea></div><div class="form-group"><label>How found</label><input id="f-source" value="${l.source||''}" placeholder="Google Maps, Yelp, cold call..."/></div><div class="modal-footer">${EID?`<button class="btn btn-danger btn-sm" onclick="deleteLead()">Delete</button>`:''}<button class="btn" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveLead()">Save</button></div>`;}
+function openAddLead(){EID=null;openModal(leadForm());}
+function editLead(id){EID=id;const l=D.leads.find(x=>x.id===id);if(l)openModal(leadForm(l));}
+function saveLead(){const g=id=>document.getElementById(id).value.trim(),lead={business:g('f-biz'),contact:g('f-contact'),phone:g('f-phone'),email:g('f-email'),status:g('f-status'),value:g('f-value'),package:g('f-package'),retainer:g('f-retainer'),followup:g('f-followup'),closedate:g('f-closedate'),industry:g('f-industry'),notes:g('f-notes'),source:g('f-source')};if(!lead.business){alert('Please enter a business name');return;}if(EID){const i=D.leads.findIndex(x=>x.id===EID),old=D.leads[i];D.leads[i]={...old,...lead};if(old.status!==lead.status)log(`${lead.business} moved to ${lead.status}`);else log(`Updated ${lead.business}`);}else{lead.id=uid();lead.created=new Date().toISOString();D.leads.push(lead);log(`Added ${lead.business} as new lead`);}save();closeModal();render();}
+function deleteLead(){if(!confirm('Delete this lead?'))return;const l=D.leads.find(x=>x.id===EID);D.leads=D.leads.filter(x=>x.id!==EID);log(`Deleted ${l?.business||'lead'}`);save();closeModal();render();}
+load();
+</script>
+</body>
+</html>
